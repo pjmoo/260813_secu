@@ -14,4 +14,10 @@ public class CustomUserDetails implements UserDetails {
     private final long id;
     private final String username;
     private final String password;
+
+    public boolean isAdmin() {
+        return authorities.stream()
+                .anyMatch(a -> a.getAuthority()
+                        .equals("ROLE_ADMIN"));
+    }
 }
