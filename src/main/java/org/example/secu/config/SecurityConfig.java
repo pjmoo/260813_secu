@@ -38,6 +38,7 @@ public class SecurityConfig {
                         auth -> auth
 //                                .requestMatchers("/").permitAll()
 //                                .requestMatchers("/signup").permitAll()
+                                .requestMatchers("/css/**", "/error/**").permitAll()
                                 .requestMatchers("/", "/signup").permitAll()
                                 .anyRequest().authenticated()
                 )
