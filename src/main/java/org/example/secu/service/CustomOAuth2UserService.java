@@ -1,6 +1,7 @@
 package org.example.secu.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.secu.domain.dto.CustomOAuth2User;
 import org.example.secu.domain.dto.KakaoOAuth2DTO;
 import org.example.secu.domain.entity.UserAccountEntity;
 import org.example.secu.domain.repository.UserAccountRepository;
@@ -37,7 +38,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             case "kakao" -> {
                 KakaoOAuth2DTO kakaoOAuth2DTO = objectMapper.convertValue(attributes, KakaoOAuth2DTO.class);
                 providerId = kakaoOAuth2DTO.id();
-                nickname = kakaoOAuth2DTO.kakaoAccount().profile().nickname();
+                nickname = kakaoOAuth2DTO.kakao_account().profile().nickname();
             }
             default -> {
                 throw new OAuth2AuthenticationException(
@@ -47,19 +48,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             }
         }
         // 로그인 시도
+        UserAccountEntity userAccount;
         try {
-            UserAccountEntity userAccount = userAccountRepository
+            userAccount = userAccountRepository
                     .findBySocialIdAndSocialProvider(providerId, registrationId)
                     .orElseThrow();
         } catch (NoSuchElementException e) {
             UserAccountEntity oUser = UserAccountEntity.builder()
                     .socialId(providerId)
                     .socialProvider(registrationId)
-                    .username(nickname)
+                    .username("%s_%s".formatted(providerId, registrationId))
+                    .role("user")
                     .build();
-            userAccountRepository.save(oUser);
+            userAccount = userAccountRepository.save(oUser);
         }
-        return super.loadUser(userRequest);
+//        return super.loadUser(userRequest);
+        return new CustomOAuth2User(userAccount, attributes);
     }
 
     private final UserAccountRepository userAccountRepository;

@@ -16,8 +16,8 @@ public class UserAccountEntity {
     private long id; // 로그인용이 아니라 식별용
     @Column(unique = true, nullable = false)
     private String username; // 중복되면 곤란
-    @Column(nullable = false)
-    private String password;
+    // @Column(nullable = false)
+    private String password; // 소셜 로그인의 경우 비밀번호가 별도로 없음
     @Column(nullable = false)
     private String role;
     // SocialLogin

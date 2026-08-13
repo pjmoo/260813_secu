@@ -1,6 +1,7 @@
 package org.example.secu.domain.dto;
 
-public record KakaoOAuth2DTO(String id, KakaoAccount kakaoAccount) {
+public record KakaoOAuth2DTO(String id,
+                             KakaoAccount kakao_account) {
     public record KakaoAccount(Profile profile) {
     }
 
