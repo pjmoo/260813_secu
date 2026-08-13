@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .defaultSuccessUrl("/", true)
                         .permitAll())
+                .logout(logout -> logout.logoutSuccessUrl("/"))
                 .build();
     }
 }

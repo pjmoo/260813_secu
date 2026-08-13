@@ -35,7 +35,8 @@ public class UserAccountController {
     }
 
     @GetMapping("/login")
-    public String login() {
+    public String login(Model model) {
+        model.addAttribute("form", new UserForm("", ""));
         return "user/login";
     }
 }
