@@ -70,7 +70,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .socialProvider(registrationId)
                     // kakao_******
                     .username("%s_%s".formatted(providerId, registrationId))
-                    // .password ...
+                    .password(java.util.UUID.randomUUID().toString()) // DB의 password NOT NULL 제약조건 우회
                     .role("user")
                     .build();
             userAccount = userAccountRepository.save(oUser);
