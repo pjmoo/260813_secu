@@ -14,4 +14,6 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
             ORDER BY c.id DESC
             """)
     List<CommentEntity> findAllWithUser();
+//    @EntityGraph(attributePaths = "user")
+//    List<CommentEntity> findAll();
 }
