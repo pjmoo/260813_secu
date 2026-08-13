@@ -26,20 +26,30 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        OAuth2User ou = super.loadUser(userRequest);
+        OAuth2User ou = super.loadUser(userRequest); // Provider를 통해서 받은 정보
         // 상속 받은 원본(상위) 클래스에서 이미 구현된 loadUser로 OAuth2User
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+
+        // 1. OAuth2User -> DB에 있는 UserAccountEntity를 조회하거나 생성
+
         // provider 이름
-        Map<String, Object> attributes = ou.getAttributes();
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+        // kakao, google
+        Map<String, Object> attributes = ou.getAttributes(); // provider마다 형태가 다름
+
         String providerId; // provider에서 제공해주는 식별자
-        String nickname;
+//        String nickname;
+
         ObjectMapper objectMapper = new ObjectMapper();
+
         switch (registrationId) {
             case "kakao" -> {
+                // JSON -> Map => DTO
                 KakaoOAuth2DTO kakaoOAuth2DTO = objectMapper.convertValue(attributes, KakaoOAuth2DTO.class);
                 providerId = kakaoOAuth2DTO.id();
-                nickname = kakaoOAuth2DTO.kakao_account().profile().nickname();
+                // nickname = kakaoOAuth2DTO.kakao_account().profile().nickname();
+                // profile_image, email...
             }
+            // google...
             default -> {
                 throw new OAuth2AuthenticationException(
                         new OAuth2Error("unsupported provider"),
@@ -47,23 +57,29 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 );
             }
         }
+
         // 로그인 시도
         UserAccountEntity userAccount;
         try {
             userAccount = userAccountRepository
                     .findBySocialIdAndSocialProvider(providerId, registrationId)
-                    .orElseThrow();
+                    .orElseThrow(); // 없으면? -> Throw -> catch
         } catch (NoSuchElementException e) {
             UserAccountEntity oUser = UserAccountEntity.builder()
                     .socialId(providerId)
                     .socialProvider(registrationId)
+                    // kakao_******
                     .username("%s_%s".formatted(providerId, registrationId))
+                    // .password ...
                     .role("user")
                     .build();
             userAccount = userAccountRepository.save(oUser);
+            // 가입 처리
         }
 //        return super.loadUser(userRequest);
         return new CustomOAuth2User(userAccount, attributes);
+        // OAuth2User / CustomUserDetails
+        // -> Spring Security -> loadUsername -> UserAccount.
     }
 
     private final UserAccountRepository userAccountRepository;
