@@ -18,7 +18,7 @@
             th:object="${form}"
     >
         <label>유저이름 : <input th:field="*{username}"/></label>
-        <label>비밀번호 : <input th:field="*{password}"/></label>
+        <label>비밀번호 : <input type="password" th:field="*{password}"/></label>
         <button>가입</button>
     </form>
 </section>
